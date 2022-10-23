@@ -24,6 +24,7 @@
         path: "/usr/local/bin/kubectl"
         mode: "0775"
     - name: Download minikube
+      become: true
       ansible.builtin.get_url:
         utl: "https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64"
         dest: "/usr/local/bin/minikube"
