@@ -1,0 +1,35 @@
+---
+- name: Install minikube
+  host: all
+  pre_tasks:
+    - name: Check virtualization
+       ansible.builtin.command: "egrep -q 'vmx|svm' /proc/cpuinfo && echo yes || echo no"
+       register: virtualization
+       failed_when: virtualization.rc == "no"
+    - name: Add user in group "libvirt"
+      ansible.builtin.user:
+        become: true 
+        name: "{{ ansible_user_id }}"
+        groups: "libvirt"
+        append: yes
+  tasks:
+    - name: Download kubectl
+      become: true
+      ansible.builtin.get_url:
+        url: "https://storage.googleapis.com/kubernetes-release/release/{{ kubectl_version }}/bin/linux/amd64/kubectl"
+        dest: "/usr/local/bin/kubectl"
+    - name: Add attributes kubectl
+      become: true
+      ansible.builtin.file:
+        path: "/usr/local/bin/kubectl"
+        mode: "0775"
+    - name: Download minikube
+      ansible.builtin.get_url:
+        utl: "https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64"
+        dest: "/usr/local/bin/minikube"
+    - name: Add attributes minikube
+      become: true
+      ansible.builtin.file:
+        path: "/usr/local/bin/minikube"
+        mode: "0775"
+    
